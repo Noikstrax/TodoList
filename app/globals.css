@@ -6,7 +6,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
-    --foreground: #ededed;
+--foreground: #ededed;
   }
 }
 
@@ -35,6 +35,25 @@ a {
   text-decoration: none;
 }
 
+.todo-element .name, .todo-tasks .task {
+  display: flex;
+  flex-direction: wrap;
+}
+
+input[type="checkbox"] {
+  appearance: none;
+  width: 1rem;
+  height: 1rem;
+  border: 1px solid #0d6efd;
+  border-radius: 0.25rem;
+  background-color: #fff;
+  cursor: pointer;
+}
+input[type="checkbox"]:checked {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e");
+}
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
