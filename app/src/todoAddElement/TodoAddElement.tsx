@@ -12,7 +12,12 @@ export default function TodoAddElement({todoAddFunction}) {
          isCompleted: false,
          tasks: [],
         };
-        todoAddFunction(todoItem);
+        if (todoItem.name !== "") {
+          todoAddFunction(todoItem);
+          e.target.newTaskName.value = '';
+        } else {
+          console.error('Input name');
+        }
       }}>
       <input type="text" name="newTaskName" />
       <button type="submit">+</button>
