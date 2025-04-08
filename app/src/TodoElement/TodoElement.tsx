@@ -39,7 +39,6 @@ export default function TodoElement({elementData, id, updateTodoItems, handleDel
     setTodoElementData({
       ...todoElementData,
       tasks: [...todoElementData.tasks.filter(task => task.id != taskId)],
-
     })
   }
 
@@ -64,11 +63,11 @@ export default function TodoElement({elementData, id, updateTodoItems, handleDel
     <div className={styles.wrapper}>
     <div className="todo-element" key={todoElementData.id}>
      <div className="name">
-     <h1>{todoElementData.name}</h1>
-     <input type="checkbox" defaultChecked={todoElementData.isCompleted} onClick={(e) => {
+     <input className='todo-item-checkbox' type="checkbox" defaultChecked={todoElementData.isCompleted} onClick={(e) => {
       console.log(`Item:id: ${todoElementData.id}`);
       handleCheckElement(todoElementData.id);
      }}/>
+     <h1>{todoElementData.name}</h1>
      <button onClick={(e) => {
       e.preventDefault();
       console.log(`Item:id: ${todoElementData.id}`);
@@ -78,13 +77,13 @@ export default function TodoElement({elementData, id, updateTodoItems, handleDel
      <div className="todo-tasks">
      {todoElementData.tasks.map(task => (
      <div className="task" key={`${task.id}-${todoElementData.id}`}>
-      <p>{task.taskName}</p>
-      <input type="checkbox" defaultChecked={task.isCompleted} onClick={(e) => {
+       <input type="checkbox" defaultChecked={task.isCompleted} onClick={(e) => {
         handleChangeCheckbox(task.id);
       }}/>
+      <p>{task.taskName}</p>
       <button onClick={(e) => {
         e.preventDefault();
-        handleRemoveTask(todoElementData.id);
+        handleRemoveTask(task.id);
       }}>Del</button>
 
      </div>
@@ -97,7 +96,7 @@ export default function TodoElement({elementData, id, updateTodoItems, handleDel
        e.target.taskName.value = "";
      }}>
      <input type="text" name="taskName"/>
-     <button type="submit">+</button>
+     <button className='add-task-button' type="submit">+</button>
      </form>
      </div>
     </div>

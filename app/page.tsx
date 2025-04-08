@@ -91,6 +91,10 @@ function handleCheckElement(elementId) {
   }))
 }
 
+function handleDeleteTask(taskId) {
+  
+}
+
 function handleDeleteElement(elementId) {
   setTodoData(todoData.filter(todoElement => todoElement.id !== elementId));
 };

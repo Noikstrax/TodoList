@@ -20,7 +20,7 @@ export default function TodoAddElement({todoAddFunction}) {
         }
       }}>
       <input type="text" name="newTaskName" />
-      <button type="submit">+</button>
+      <button className='add-todo-button' type="submit">+</button>
       </form>
     </div>
   )
