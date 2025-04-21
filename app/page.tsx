@@ -91,8 +91,9 @@ function handleCheckElement(elementId) {
   }))
 }
 
-function handleDeleteTask(taskId) {
+function handleDeleteTask(taskId: string): void {
   
+
 }
 
 function handleDeleteElement(elementId) {

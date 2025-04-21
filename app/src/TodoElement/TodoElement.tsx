@@ -4,17 +4,29 @@ import styles from './todoElement.module.css';
 import { useState } from 'react';
 import { nanoid } from 'nanoid';
 import { useEffect } from 'react';
+import clsx from 'clsx';
+import TodoTask from '../todoTask/TodoTask';
+import TodoName from '../todoName/todoName';
 
 
 
 export default function TodoElement({elementData, id, updateTodoItems, handleDeleteElement, handleCheckElement}) {
 
 
-  const [todoElementData, setTodoElementData] = useState(elementData);
+  const todoElementData = elementData;
+
+  function updateElement(newData) {
+    updateTodoItems(id, newData);
+  }
 
   useEffect(() => {
     updateTodoItems(id, todoElementData);
   }, [todoElementData, id]);
+
+
+  // useEffect(() => {
+  //   updateElement(elementData);
+  // }, [elementData]);
 
   function toggleChecked(e) {
     e.target.checked = !e.target.checked;
@@ -22,7 +34,7 @@ export default function TodoElement({elementData, id, updateTodoItems, handleDel
   }
     
   function handleAddTask(taskValue) {
-   setTodoElementData({
+   updateElement({
      ...todoElementData,
      tasks: [
        ...todoElementData.tasks,
@@ -34,16 +46,49 @@ export default function TodoElement({elementData, id, updateTodoItems, handleDel
      ]
    }) 
   }
+
+  function handleUpdateTask(taskValue, taskId) {
+    try {
+      updateElement({
+        ...todoElementData,
+        tasks: todoElementData.tasks.map(task => {
+            if (task.id === taskId) {
+              return {
+                ...task,
+                taskName: taskValue,
+  
+              }
+            } else {
+              return task;
+            }
+          })
+      })
+    } catch(error) {
+      console.error(error);
+    }
+
+  }
+
+  function handleUpdateTaskName(todoNameValue) {
+    try {
+      updateElement({
+        ...todoElementData,
+        name: todoNameValue
+      })
+    } catch(err) {
+      console.error(err);
+    }
+  }
   
   function handleRemoveTask(taskId) {
-    setTodoElementData({
+    updateElement({
       ...todoElementData,
       tasks: [...todoElementData.tasks.filter(task => task.id != taskId)],
     })
   }
 
   function handleChangeCheckbox(taskId) {
-    setTodoElementData({
+    updateElement({
       ...todoElementData,
       tasks: [...todoElementData.tasks.map(task => {
         if (task.id === taskId) {
@@ -62,32 +107,37 @@ export default function TodoElement({elementData, id, updateTodoItems, handleDel
   return (
     <div className={styles.wrapper}>
     <div className="todo-element" key={todoElementData.id}>
-     <div className="name">
+     <div className={clsx('name',
+      todoElementData.isCompleted && 'text-completed')}>
      <input className='todo-item-checkbox' type="checkbox" defaultChecked={todoElementData.isCompleted} onClick={(e) => {
-      console.log(`Item:id: ${todoElementData.id}`);
+      //console.log(`Item:id: ${todoElementData.id}`);
       handleCheckElement(todoElementData.id);
      }}/>
-     <h1>{todoElementData.name}</h1>
+     <TodoName todoName={todoElementData.name} updateName={handleUpdateTaskName}/>
      <button onClick={(e) => {
       e.preventDefault();
       console.log(`Item:id: ${todoElementData.id}`);
       handleDeleteElement(todoElementData.id);
      }}>Del</button>
      </div>
+     <div className='item-scroll'>
      <div className="todo-tasks">
      {todoElementData.tasks.map(task => (
-     <div className="task" key={`${task.id}-${todoElementData.id}`}>
-       <input type="checkbox" defaultChecked={task.isCompleted} onClick={(e) => {
-        handleChangeCheckbox(task.id);
-      }}/>
-      <p>{task.taskName}</p>
-      <button onClick={(e) => {
-        e.preventDefault();
-        handleRemoveTask(task.id);
-      }}>Del</button>
+      <TodoTask key={task.id} task={task} todoElementData={todoElementData} handleChangeCheckbox={handleChangeCheckbox} handleRemoveTask={handleRemoveTask} updateTask={'test'} updateTask={handleUpdateTask}/>
+    //  <div className="task" key={`${task.id}-${todoElementData.id}`}>
+    //    <input type="checkbox" defaultChecked={task.isCompleted} onClick={(e) => {
+    //     handleChangeCheckbox(task.id);
+    //   }}/>
+    //   <p className={clsx('',
+    //   task.isCompleted && 'text-completed')}>{task.taskName}</p>
+    //   <button onClick={(e) => {
+    //     e.preventDefault();
+    //     handleRemoveTask(task.id);
+    //   }}>Del</button>
 
-     </div>
+    //  </div>
      ))}
+     </div>
      </div>
      <div className="task-add">
      <form onSubmit={(e) => {

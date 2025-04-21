@@ -14,6 +14,7 @@ html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
+  height: 100%;
 }
 
 body {
@@ -41,12 +42,33 @@ a {
 }
 .todo-element {
   border: solid 3px red;
-  min-height: 200px;
-  max-height: 400px;
+  min-height: 250px;
+  max-height: 250px;
+  height: 250px;
 }
-.todo-element .name, .todo-tasks .task {
+.name, .todo-tasks .task {
   display: flex;
   flex-direction: wrap;
+}
+
+.todo-element {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.item-scroll {
+  overflow-y: hidden;
+  flex: 1;
+  height: 70%;
+  max-height: 70%;
+}
+.item-scroll:hover {
+  overflow-y: auto;
+}
+
+.task-add {
+  padding: 10px;
 }
 
 input[type="checkbox"] {
@@ -67,6 +89,12 @@ input[type="checkbox"]:checked {
 .todo-item-checkbox {
   margin: 0.25rem;
 }
+
+.text-completed {
+  opacity: 60%;
+  text-decoration-line: line-through;
+}
+
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
