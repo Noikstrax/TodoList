@@ -8,6 +8,13 @@ export default function TodoName({todoName, updateName}) {
     const [isEditing, setIsEditing] = useState(false);
     const inputAreaRef = useRef(null);
 
+    const handleEnterKeyDown = (e) => {
+        if (isEditing && e.key === 'Enter') {
+            updateName(e.target.value);
+            setIsEditing(!isEditing);
+        }
+    }
+
     useEffect(() => {
         if (isEditing && inputAreaRef.current) {
             inputAreaRef.current.focus();
@@ -31,7 +38,8 @@ export default function TodoName({todoName, updateName}) {
             onBlur={(e) => {
                 updateName(e.target.value);
                 setIsEditing(!isEditing);
-            }}>
+            }}
+            onKeyDown={handleEnterKeyDown}>
             </input>
             </>
         )

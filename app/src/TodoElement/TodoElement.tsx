@@ -105,7 +105,8 @@ export default function TodoElement({elementData, id, updateTodoItems, handleDel
 
 
   return (
-    <div className={styles.wrapper}>
+    <div className={styles.wrapper} 
+    >
     <div className="todo-element" key={todoElementData.id}>
      <div className={clsx('name',
       todoElementData.isCompleted && 'text-completed')}>
@@ -117,7 +118,7 @@ export default function TodoElement({elementData, id, updateTodoItems, handleDel
      <button onClick={(e) => {
       e.preventDefault();
       console.log(`Item:id: ${todoElementData.id}`);
-      handleDeleteElement(todoElementData.id);
+      handleDeleteElement(todoElementData.id, todoElementData.order);
      }}>Del</button>
      </div>
      <div className='item-scroll'>

@@ -1,7 +1,7 @@
 'use client';
 import { nanoid } from 'nanoid';
 
-export default function TodoAddElement({todoAddFunction}) {
+export default function TodoAddElement({todoAddFunction, orderNumber}) {
   return (
     <div className="todo-add">
       <form onSubmit={(e) => {
@@ -11,6 +11,7 @@ export default function TodoAddElement({todoAddFunction}) {
          name: e.target.newTaskName.value,
          isCompleted: false,
          tasks: [],
+         order: orderNumber
         };
         if (todoItem.name !== "") {
           todoAddFunction(todoItem);

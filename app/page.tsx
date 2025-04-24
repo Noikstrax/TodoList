@@ -34,6 +34,7 @@ export default function Home() {
   //const [todoData, setTodoData] = useState(todoDataTest);
   const [todoData, setTodoData] = useState([]);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [currentTodoItem, setCurrentTodoItem] = useState(null);
 
   useEffect(() => {
     const storedData = localStorage.getItem('todoList');
@@ -91,21 +92,115 @@ function handleCheckElement(elementId) {
   }))
 }
 
+function updateTodoTask(elementId, todoTaskId) {
+  
+}
+
 function handleDeleteTask(taskId: string): void {
   
 
 }
 
-function handleDeleteElement(elementId) {
-  setTodoData(todoData.filter(todoElement => todoElement.id !== elementId));
+function handleDeleteElement(elementId, orderNumber) {
+  setTodoData(todoData.filter(todoElement => todoElement.id !== elementId).map((todoElem) => {
+    if (todoElem.order > orderNumber) {
+      return {
+        ...todoElem,
+        order: --todoElem.order,
+      }
+    } else {
+      return todoElem;
+    }
+  }));
+  // setTodoData(todoData.map((todoElement) => {
+  //   if (todoElement.order < orderNumber) {
+  //     return todoElement;
+  //   } else if (todoElement.order > orderNumber) {
+  //     return {
+  //       ...todoElement,
+  //       order: todoElement.order--
+  //     }
+  //   }
+  // }))
 };
+
+
+function dragStartHandler(e, todoItem) {
+  console.log('drag', todoItem)
+
+}
+
+function dragEndHandler(e) {
+
+}
+
+function dragOverHandler(e) {
+  e.preventDefault();
+
+}
+
+function dropHandler(e, todoItem) {
+  e.preventDefault();
+  console.log('drop', todoItem)
+  setTodoData(todoData.map((item) => {
+    if (item.id === todoItem.id) {
+      return {
+        ...item,
+        order: currentTodoItem.order,
+      }
+    }
+    if (item.id === currentTodoItem.id) {
+      return {
+        ...item,
+        order: todoItem.order,
+      }
+    }       
+  }))
+}
+
+
+const sortTodoItems = (a, b) => {
+  if (a.order > b.order) {
+    return 1;
+  } else {
+    return -1;
+  }
+
+}
 
   return (
     <div className="grid">
-      {todoData.map(todoItem => (
-        <TodoElement elementData={todoItem} key={todoItem.id} id={todoItem.id} updateTodoItems={updateTodoItems} handleDeleteElement={handleDeleteElement} handleCheckElement={handleCheckElement}/>
+      {todoData.sort(sortTodoItems).map(todoItem => (
+        <div key={todoItem.id}
+        draggable={true}
+        onDragStart={(e) => {
+          dragStartHandler(e, todoItem);
+          setCurrentTodoItem(todoItem);
+
+        }}
+        onDragEnd={(e) => {
+          dragEndHandler(e);
+          
+
+        }}
+        
+        onDragLeave={(e) => {
+          dragEndHandler(e);
+
+        }}
+        
+        onDragOver={(e) => {
+          dragOverHandler(e);
+
+        }}
+        onDrop={(e) => {
+          dropHandler(e, todoItem);
+
+        }}>
+        <TodoElement elementData={todoItem} id={todoItem.id} updateTodoItems={updateTodoItems} handleDeleteElement={handleDeleteElement} handleCheckElement={handleCheckElement}/>
+        </div>
       ))}
-      <TodoAddElement todoAddFunction={addTodoElement} />
+      <TodoAddElement todoAddFunction={addTodoElement} orderNumber={todoData.length}/>
 
     </div>
   );

@@ -11,6 +11,7 @@ export default function TodoTask({task, todoElementData, updateTask, handleChang
         setIsEditing(!isEditing);
     }
 
+
     useEffect(() => {
         if (isEditing && inputAreaRef.current) {
             inputAreaRef.current.focus();
@@ -55,7 +56,13 @@ export default function TodoTask({task, todoElementData, updateTask, handleChang
                 if (task.taskName !== e.target.value) updateTask(e.target.value, task.id);
                 handleClick();
              }}
-             ref={inputAreaRef}></input>
+             ref={inputAreaRef}
+             onKeyDown={(e) => {
+              if (isEditing && e.key === 'Enter') {
+                updateTask(e.target.value, task.id);
+                handleClick();
+              }
+             }}></input>
              <button onClick={(e) => {
                e.preventDefault();
                handleRemoveTask(task.id);
