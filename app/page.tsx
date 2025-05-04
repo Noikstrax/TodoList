@@ -1,8 +1,8 @@
 'use client';
-import TodoElement from '@/app/src/TodoElement/TodoElement';
+import TodoElement from './src/components/TodoElement';
 import { useState } from 'react';
 import TodoAddElement from '@/app/src/todoAddElement/TodoAddElement';
-import { useEffect } from 'react';
+import { useEffect, useReducer, useCallback } from 'react';
 
 const todoDataTest = [
   {
@@ -29,10 +29,67 @@ const todoDataTest = [
   },
 ];
 
+
+
+type SubTask = {
+  id: string,
+  taskName: string,
+  isCompleted: boolean,
+  order: number
+}
+
+type TodoItem = {
+  id: string,
+  name: string,
+  isCompleted: boolean,
+  tasks: SubTask[],
+  order: number;
+}
+
+type Action =
+| {type: 'SET_TODOS'; payload: TodoItem[]}
+| {type: 'ADD_TODO'; payload: TodoItem }
+| {type: 'UPDATE_TODOS'; payload: {itemId: string, newTodoItem: TodoItem}}
+| {type: 'HANDLE_CHECK_TODO'; payload: {elementId: string}}
+| {type: 'HANDLE_DELETE_TODO', payload: {elementId: string, orderNumber: number}};
+
+type TodoState = TodoItem[];
+
+function todoElementsReducer(state: TodoState, action: Action): TodoState {
+  switch(action.type) {
+    case 'SET_TODOS':
+      return action.payload;
+    case 'ADD_TODO':
+      return [...state, action.payload];
+    case 'UPDATE_TODOS':
+      return state.map(todoItem => {
+        if (action.payload.itemId === todoItem.id) {
+          return action.payload.newTodoItem;
+        } else {
+          return todoItem;
+        }
+      })
+    case 'HANDLE_CHECK_TODO':
+      return state.map(todoItem => {
+        if (todoItem.id === action.payload.elementId) {
+          return {
+            ...todoItem,
+            isCompleted: !todoItem.isCompleted,
+          }
+        } else {
+          return todoItem;
+        }
+
+      });
+      
+  }
+
+}
 export default function Home() {
 
   //const [todoData, setTodoData] = useState(todoDataTest);
-  const [todoData, setTodoData] = useState([]);
+  //const [todoData, setTodoData] = useState([]);
+  const [todoData, dispatch] = useReducer(todoElementsReducer, []);
   const [isInitialized, setIsInitialized] = useState(false);
   const [currentTodoItem, setCurrentTodoItem] = useState(null);
 
@@ -40,7 +97,8 @@ export default function Home() {
     const storedData = localStorage.getItem('todoList');
     if (storedData) {
       try {
-        setTodoData(JSON.parse(storedData));
+        const parsedData = JSON.parse(storedData);
+        dispatch({type: 'SET_TODOS', payload: parsedData})
       } catch (e) {
         console.error(e);
       }
@@ -54,42 +112,33 @@ export default function Home() {
   }, [todoData])
 
 
-  function addTodoElement(item) {
-    setTodoData([...todoData, item]);
+  function addTodoElement(item: TodoItem): void {
+    dispatch({type: 'ADD_TODO', payload: item})
   }
 
   function setDataInLocalStorage(data12) {
     localStorage.setItem('todoList', JSON.stringify(data12));
   }
 
-  function updateTodoItems(itemId, newTodoItem) {
-    if (!isInitialized) return;
-    setTodoData(todoData.map(todoItem => {
-      if (itemId === todoItem.id) {
-        return newTodoItem;
-      } else {
-        return todoItem;
-      }
-    }));
-  }
 
-function handleCheckElement(elementId) {
-  setTodoData(todoData.map(todoElement => {
-    if (todoElement.id === elementId) {
-      // const updatedElement = {
-      //   ...todoElement,
-      //   isCompleted: !todoElement.isCompleted,
-      // };
-      // console.log("Updated element:", updatedElement); // Проверяем новое значение
-      // return updatedElement;
-      return {
-        ...todoElement,
-        isCompleted: !todoElement.isCompleted,
-      }
-    } else {
-      return todoElement;
-    }
-  }))
+  const updateTodoItems = useCallback((itemId: string, newTodoItem: TodoItem): void => {
+    if (!isInitialized) return;
+    dispatch({type: 'UPDATE_TODOS', payload: {itemId, newTodoItem}});
+  }, [dispatch, isInitialized]);
+
+function handleCheckElement(elementId: string) {
+  dispatch({type: 'HANDLE_CHECK_TODO', payload: {elementId}});
+  
+  // setTodoData(todoData.map(todoElement => {
+  //   if (todoElement.id === elementId) {
+  //     return {
+  //       ...todoElement,
+  //       isCompleted: !todoElement.isCompleted,
+  //     }
+  //   } else {
+  //     return todoElement;
+  //   }
+  // }))
 }
 
 function updateTodoTask(elementId, todoTaskId) {
@@ -101,8 +150,8 @@ function handleDeleteTask(taskId: string): void {
 
 }
 
-function handleDeleteElement(elementId, orderNumber) {
-  setTodoData(todoData.filter(todoElement => todoElement.id !== elementId).map((todoElem) => {
+function handleDeleteElement(elementId: string, orderNumber: number): void {
+  setTodoData(todoData.filter((todoElement: TodoItem) => todoElement.id !== elementId).map((todoElem: TodoItem) => {
     if (todoElem.order > orderNumber) {
       return {
         ...todoElem,
@@ -112,21 +161,11 @@ function handleDeleteElement(elementId, orderNumber) {
       return todoElem;
     }
   }));
-  // setTodoData(todoData.map((todoElement) => {
-  //   if (todoElement.order < orderNumber) {
-  //     return todoElement;
-  //   } else if (todoElement.order > orderNumber) {
-  //     return {
-  //       ...todoElement,
-  //       order: todoElement.order--
-  //     }
-  //   }
-  // }))
 };
 
 
 function dragStartHandler(e, todoItem) {
-  console.log('drag', todoItem)
+  //console.log('drag', todoItem)
 
 }
 
@@ -141,7 +180,8 @@ function dragOverHandler(e) {
 
 function dropHandler(e, todoItem) {
   e.preventDefault();
-  console.log('drop', todoItem)
+  //console.log('drop', todoItem)
+  try {
   setTodoData(todoData.map((item) => {
     if (item.id === todoItem.id) {
       return {
@@ -154,8 +194,13 @@ function dropHandler(e, todoItem) {
         ...item,
         order: todoItem.order,
       }
-    }       
+    }
+    return item;       
   }))
+ // console.log(todoData);
+  } catch(err) {
+    console.error(err);
+  }
 }
 
 
@@ -197,7 +242,7 @@ const sortTodoItems = (a, b) => {
           dropHandler(e, todoItem);
 
         }}>
-        <TodoElement elementData={todoItem} id={todoItem.id} updateTodoItems={updateTodoItems} handleDeleteElement={handleDeleteElement} handleCheckElement={handleCheckElement}/>
+        <TodoElement todoItem={todoItem} updateTodoItems={updateTodoItems} handleDeleteElement={handleDeleteElement} handleCheckElement={handleCheckElement}/>
         </div>
       ))}
       <TodoAddElement todoAddFunction={addTodoElement} orderNumber={todoData.length}/>
