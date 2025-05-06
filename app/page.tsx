@@ -144,7 +144,7 @@ function handleCheckElement(elementId: string) {
   dispatch({type: 'HANDLE_CHECK_TODO', payload: {elementId}}); 
 }
 
-function updateTodoTask(elementId, todoTaskId) {
+function updateTodoTask(elementId, todoTaskId): void {
   
 }
 
@@ -158,20 +158,20 @@ function handleDeleteElement(elementId: string, orderNumber: number): void {
 };
 
 
-function dragStartHandler(e, todoItem: TodoItem) {
+function dragStartHandler(e: React.DragEvent, todoItem: TodoItem): void {
   setCurrentTodoItem(todoItem);
 }
 
-function dragEndHandler(e) {
+function dragEndHandler(e: React.DragEvent): void {
 
 }
 
-function dragOverHandler(e) {
+function dragOverHandler(e: React.DragEvent): void {
   e.preventDefault();
 
 }
 
-function dropHandler(e, todoItem: TodoItem) {
+function dropHandler(e: React.DragEvent, todoItem: TodoItem): void {
   e.preventDefault();
   try {
   if (currentTodoItem !== null) {
