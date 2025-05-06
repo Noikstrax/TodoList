@@ -8,9 +8,10 @@ import TodoName from '../todoName/todoName';
 import { todo } from 'node:test';
 
 
-export default function TodoElement({todoItem, updateTodoItems, handleCheckElement}) {
+export default function TodoElement({todoItem, updateTodoItems, handleCheckElement, handleDeleteElement}) {
 
-    const [todoElementData, setTodoElementData] = useState(todoItem);
+
+    const todoElementData = todoItem;
 
     const sortTasks = (a, b) => {
         if (a.order > b.order) {
@@ -20,16 +21,18 @@ export default function TodoElement({todoItem, updateTodoItems, handleCheckEleme
         }
     }
 
-   useEffect(() => {
-      updateTodoItems(todoElementData.id, todoElementData);
+//    useEffect(() => {
+//       updateTodoItems(todoElementData.id, todoElementData);
 
-   }, [todoElementData, updateTodoItems])
+//    }, [todoElementData, updateTodoItems])
 
     function updateName(name: string): void {
-        setTodoElementData({
+        const newNameState = {
             ...todoElementData,
-            name: name
-        });
+            name: name,
+        }
+        
+        updateTodoItems(todoElementData.id, newNameState);
     }
 
 
@@ -47,7 +50,7 @@ export default function TodoElement({todoItem, updateTodoItems, handleCheckEleme
                     <TodoName todoName={todoElementData.name} updateName={updateName} />
                     <button onClick={(e) => {
                         e.preventDefault();
-                        //handleDeleteElem
+                        handleDeleteElement(todoElementData.id, todoElementData.order);
                     }}>Del</button>
                 </div>
                 <div className='item-scroll'>

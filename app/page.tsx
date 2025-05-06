@@ -4,33 +4,6 @@ import { useState } from 'react';
 import TodoAddElement from '@/app/src/todoAddElement/TodoAddElement';
 import { useEffect, useReducer, useCallback } from 'react';
 
-const todoDataTest = [
-  {
-  id: '0ad21312gsfdd',
-  name: 'Приготовить гречку',
-  isCompleted: false,
-  tasks: [
-    {taskName: 'Взять кастрюлу', isCompleted: false, id: 0},
-    {taskName: 'Налить воды', isCompleted: false, id: 1},
-    {taskName: 'Засыпать гречку', isCompleted: false, id: 2},
-    {taskName: 'Варить 15 минут', isCompleted: true, id: 3},
-    ],
-  },
-  {
-  id: '2131adeaba',
-  name: 'Приготовить гречку',
-  isCompleted: false,
-  tasks: [
-    {taskName: 'Взять кастрюлу', isCompleted: false, id: 0},
-    {taskName: 'Налить воды', isCompleted: false, id: 1},
-    {taskName: 'Засыпать гречку', isCompleted: false, id: 2},
-    {taskName: 'Варить 20 минут', isCompleted: true, id: 3},
-    ],
-  },
-];
-
-
-
 type SubTask = {
   id: string,
   taskName: string,
@@ -47,30 +20,45 @@ type TodoItem = {
 }
 
 type Action =
-| {type: 'SET_TODOS'; payload: TodoItem[]}
+| {type: 'GET_TODOS'; payload: TodoItem[]}
 | {type: 'ADD_TODO'; payload: TodoItem }
 | {type: 'UPDATE_TODOS'; payload: {itemId: string, newTodoItem: TodoItem}}
 | {type: 'HANDLE_CHECK_TODO'; payload: {elementId: string}}
-| {type: 'HANDLE_DELETE_TODO', payload: {elementId: string, orderNumber: number}};
+| {type: 'HANDLE_DELETE_TODO'; payload: {elementId: string, orderNumber: number}}
+| {type: 'DROP_HANDLER'; payload: {todoItem: TodoItem, currentTodoItem: TodoItem}};
 
 type TodoState = TodoItem[];
 
+function setTodoListInLocalStorage(todoList: TodoState) {
+  try {
+    const json = JSON.stringify(todoList);
+    localStorage.setItem('todoList', json);
+  } catch(err) {
+    console.error('Set localStorage error:', err);
+  }
+  
+}
+
 function todoElementsReducer(state: TodoState, action: Action): TodoState {
   switch(action.type) {
-    case 'SET_TODOS':
+    case 'GET_TODOS':
       return action.payload;
     case 'ADD_TODO':
-      return [...state, action.payload];
+      const addTodoState = [...state, action.payload];
+      setTodoListInLocalStorage(addTodoState);
+      return addTodoState;
     case 'UPDATE_TODOS':
-      return state.map(todoItem => {
+      const updateTodoState = state.map(todoItem => {
         if (action.payload.itemId === todoItem.id) {
           return action.payload.newTodoItem;
         } else {
           return todoItem;
         }
-      })
+      });
+      setTodoListInLocalStorage(updateTodoState);
+      return updateTodoState;
     case 'HANDLE_CHECK_TODO':
-      return state.map(todoItem => {
+      const checkTodoState = state.map(todoItem => {
         if (todoItem.id === action.payload.elementId) {
           return {
             ...todoItem,
@@ -79,45 +67,71 @@ function todoElementsReducer(state: TodoState, action: Action): TodoState {
         } else {
           return todoItem;
         }
-
       });
+      setTodoListInLocalStorage(checkTodoState);
+      return checkTodoState;
+    case 'HANDLE_DELETE_TODO':
+      const handleDeleteState = state.filter((todoElement: TodoItem) => todoElement.id !== action.payload.elementId).map((todoElem: TodoItem) => {
+        if (todoElem.order > action.payload.orderNumber) {
+          return {
+            ...todoElem,
+            order: --todoElem.order,
+          }
+        } else {
+          return todoElem;
+        }
+      });
+      setTodoListInLocalStorage(handleDeleteState);
+      return handleDeleteState;
+
+    case 'DROP_HANDLER':
+      const { todoItem, currentTodoItem } = action.payload;
+
+      const targetOrder = todoItem.order;
+      const sourceOrder = currentTodoItem.order;
+      let tempState = state;
+      tempState = tempState.map(item => {
+        if (item.id === todoItem.id) {
+          return { ...item, order: sourceOrder };
+        }
+        if (item.id === currentTodoItem.id) {
+          return { ...item, order: targetOrder };
+        }
+        return item;
+      });
+      setTodoListInLocalStorage(tempState);
+      return tempState;
+
       
   }
 
 }
 export default function Home() {
 
-  //const [todoData, setTodoData] = useState(todoDataTest);
-  //const [todoData, setTodoData] = useState([]);
   const [todoData, dispatch] = useReducer(todoElementsReducer, []);
   const [isInitialized, setIsInitialized] = useState(false);
-  const [currentTodoItem, setCurrentTodoItem] = useState(null);
+  const [currentTodoItem, setCurrentTodoItem] = useState<TodoItem | null>(null);
 
   useEffect(() => {
     const storedData = localStorage.getItem('todoList');
     if (storedData) {
       try {
         const parsedData = JSON.parse(storedData);
-        dispatch({type: 'SET_TODOS', payload: parsedData})
+        dispatch({type: 'GET_TODOS', payload: parsedData})
       } catch (e) {
         console.error(e);
       }
     }
     setIsInitialized(true);
-
   }, [])
-
-  useEffect(() => {
-    setDataInLocalStorage(todoData);
-  }, [todoData])
 
 
   function addTodoElement(item: TodoItem): void {
     dispatch({type: 'ADD_TODO', payload: item})
   }
 
-  function setDataInLocalStorage(data12) {
-    localStorage.setItem('todoList', JSON.stringify(data12));
+  function setDataInLocalStorage(newState: TodoState) {
+    localStorage.setItem('todoList', JSON.stringify(newState));
   }
 
 
@@ -127,18 +141,7 @@ export default function Home() {
   }, [dispatch, isInitialized]);
 
 function handleCheckElement(elementId: string) {
-  dispatch({type: 'HANDLE_CHECK_TODO', payload: {elementId}});
-  
-  // setTodoData(todoData.map(todoElement => {
-  //   if (todoElement.id === elementId) {
-  //     return {
-  //       ...todoElement,
-  //       isCompleted: !todoElement.isCompleted,
-  //     }
-  //   } else {
-  //     return todoElement;
-  //   }
-  // }))
+  dispatch({type: 'HANDLE_CHECK_TODO', payload: {elementId}}); 
 }
 
 function updateTodoTask(elementId, todoTaskId) {
@@ -151,22 +154,12 @@ function handleDeleteTask(taskId: string): void {
 }
 
 function handleDeleteElement(elementId: string, orderNumber: number): void {
-  setTodoData(todoData.filter((todoElement: TodoItem) => todoElement.id !== elementId).map((todoElem: TodoItem) => {
-    if (todoElem.order > orderNumber) {
-      return {
-        ...todoElem,
-        order: --todoElem.order,
-      }
-    } else {
-      return todoElem;
-    }
-  }));
+  dispatch({type: 'HANDLE_DELETE_TODO', payload: {elementId, orderNumber}});
 };
 
 
-function dragStartHandler(e, todoItem) {
-  //console.log('drag', todoItem)
-
+function dragStartHandler(e, todoItem: TodoItem) {
+  setCurrentTodoItem(todoItem);
 }
 
 function dragEndHandler(e) {
@@ -178,33 +171,19 @@ function dragOverHandler(e) {
 
 }
 
-function dropHandler(e, todoItem) {
+function dropHandler(e, todoItem: TodoItem) {
   e.preventDefault();
-  //console.log('drop', todoItem)
   try {
-  setTodoData(todoData.map((item) => {
-    if (item.id === todoItem.id) {
-      return {
-        ...item,
-        order: currentTodoItem.order,
-      }
-    }
-    if (item.id === currentTodoItem.id) {
-      return {
-        ...item,
-        order: todoItem.order,
-      }
-    }
-    return item;       
-  }))
- // console.log(todoData);
+  if (currentTodoItem !== null) {
+    dispatch({type: 'DROP_HANDLER', payload: {todoItem, currentTodoItem}});
+  }
   } catch(err) {
     console.error(err);
   }
 }
 
 
-const sortTodoItems = (a, b) => {
+const sortTodoItems = (a: TodoItem, b: TodoItem) => {
   if (a.order > b.order) {
     return 1;
   } else {
@@ -220,13 +199,11 @@ const sortTodoItems = (a, b) => {
         draggable={true}
         onDragStart={(e) => {
           dragStartHandler(e, todoItem);
-          setCurrentTodoItem(todoItem);
 
         }}
         onDragEnd={(e) => {
           dragEndHandler(e);
           
-
         }}
         
         onDragLeave={(e) => {
