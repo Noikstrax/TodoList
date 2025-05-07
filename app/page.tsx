@@ -144,7 +144,7 @@ function handleCheckElement(elementId: string) {
   dispatch({type: 'HANDLE_CHECK_TODO', payload: {elementId}}); 
 }
 
-function updateTodoTask(elementId, todoTaskId): void {
+function updateTodoTask(elementId: string, todoTaskId: string): void {
   
 }
 

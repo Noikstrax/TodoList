@@ -8,32 +8,51 @@ import TodoName from '../todoName/todoName';
 import { todo } from 'node:test';
 
 
+// DRY!!!
+type SubTask = {
+    id: string,
+    taskName: string,
+    isCompleted: boolean,
+    order: number
+};
+
+
 export default function TodoElement({todoItem, updateTodoItems, handleCheckElement, handleDeleteElement}) {
 
 
     const todoElementData = todoItem;
 
-    const sortTasks = (a, b) => {
+    const sortTasks = (a: SubTask, b: SubTask) => {
         if (a.order > b.order) {
             return 1;
         } else {
             return -1;
         }
-    }
-
-//    useEffect(() => {
-//       updateTodoItems(todoElementData.id, todoElementData);
-
-//    }, [todoElementData, updateTodoItems])
+    };
 
     function updateName(name: string): void {
         const newNameState = {
             ...todoElementData,
             name: name,
         }
-        
         updateTodoItems(todoElementData.id, newNameState);
     }
+
+    function handleAddTask(taskValue: string): void {
+        const newTasksState = {
+            ...todoElementData,
+            tasks: [
+                ...todoElementData.tasks,
+                {
+                    taskName: taskValue,
+                    isCompleted: false,
+                    id: nanoid(),
+                    order: todoElementData.tasks.length
+                }
+            ]
+        };
+        updateTodoItems(todoElementData.id, newTasksState);
+    };
 
 
         return(
@@ -68,8 +87,10 @@ export default function TodoElement({todoItem, updateTodoItems, handleCheckEleme
                 <div className='task-add'>
                     <form onSubmit={(e) => {
                         e.preventDefault();
-                        //HandleAddTask
-                        e.target.taskName.value = "";
+                        const target = e.target as HTMLFormElement;
+                        const taskName = target.elements.namedItem('taskName') as HTMLInputElement;
+                        handleAddTask(taskName.value);
+                        taskName.value = "";
                     }}>
                         <input type="text" name='taskName' />
                         <button className='add-task-button' type="submit">+</button>
