@@ -2,15 +2,20 @@
 import { useState, useRef, useEffect } from "react";
 import clsx from "clsx";
 
+type todoNameComponentProps = {
+    todoName: string,
+    updateName: (name: string) => void
+}
 
-export default function TodoName({todoName, updateName}) {
+export default function TodoName({todoName, updateName}: todoNameComponentProps) {
 
     const [isEditing, setIsEditing] = useState(false);
-    const inputAreaRef = useRef(null);
+    const inputAreaRef = useRef<HTMLInputElement | null>(null);
 
-    const handleEnterKeyDown = (e) => {
+    const handleEnterKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (isEditing && e.key === 'Enter') {
-            updateName(e.target.value);
+            const target = e.target as HTMLInputElement;
+            updateName(target.value);
             setIsEditing(!isEditing);
         }
     }

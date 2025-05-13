@@ -135,12 +135,12 @@ export default function Home() {
   }
 
 
-  const updateTodoItems = useCallback((itemId: string, newTodoItem: TodoItem): void => {
+  function updateTodoItems(itemId: string, newTodoItem: TodoItem): void {
     if (!isInitialized) return;
     dispatch({type: 'UPDATE_TODOS', payload: {itemId, newTodoItem}});
-  }, [dispatch, isInitialized]);
+  };
 
-function handleCheckElement(elementId: string) {
+function handleCheckElement(elementId: string): void {
   dispatch({type: 'HANDLE_CHECK_TODO', payload: {elementId}}); 
 }
 

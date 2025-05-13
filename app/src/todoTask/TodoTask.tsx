@@ -2,10 +2,25 @@
 import { useState, useRef, useEffect } from "react";
 import clsx from "clsx";
 
-export default function TodoTask({task, todoElementData, updateTask, handleChangeCheckbox, handleRemoveTask}) {
+
+type SubTask = {
+  id: string,
+  taskName: string,
+  isCompleted: boolean,
+  order: number
+}
+
+type TodoTaskComponentProps = {
+  task: SubTask,
+  updateTask: (taskNameValue: string, taskId: string) => void,
+  handleChangeCheckbox: (taskId: string) => void,
+  handleRemoveTask: (taskId: string, orderNumber: number) => void
+};
+
+export default function TodoTask({task, updateTask, handleChangeCheckbox, handleRemoveTask}: TodoTaskComponentProps) {
     const [isEditing, setIsEditing] = useState(false);
 
-    const inputAreaRef = useRef(null);
+    const inputAreaRef = useRef<HTMLInputElement | null>(null);
 
     function handleClick() {
         setIsEditing(!isEditing);
@@ -22,7 +37,7 @@ export default function TodoTask({task, todoElementData, updateTask, handleChang
     if (!isEditing) {
         return (
             <>
-                 <div className="task" key={`${task.id}-${todoElementData.id}`}>
+                 <div className="task" key={`${task.id}`}>
                    <input type="checkbox" defaultChecked={task.isCompleted} onClick={(e) => {
                     handleChangeCheckbox(task.id);
                   }}/>
@@ -34,7 +49,7 @@ export default function TodoTask({task, todoElementData, updateTask, handleChang
                   }}>{task.taskName}</p>
                   <button onClick={(e) => {
                     e.preventDefault();
-                    handleRemoveTask(task.id);
+                    handleRemoveTask(task.id, task.order);
                   }}>Del</button>
             
                  </div>
@@ -45,7 +60,7 @@ export default function TodoTask({task, todoElementData, updateTask, handleChang
     } else {
         return (
             <>
-            <div className="task" key={`${task.id}-${todoElementData.id}`}>
+            <div className="task" key={`${task.id}`}>
               <input type="checkbox" defaultChecked={task.isCompleted} onClick={(e) => {
                handleChangeCheckbox(task.id);
              }}/>
@@ -59,13 +74,14 @@ export default function TodoTask({task, todoElementData, updateTask, handleChang
              ref={inputAreaRef}
              onKeyDown={(e) => {
               if (isEditing && e.key === 'Enter') {
-                updateTask(e.target.value, task.id);
+                const target = e.target as HTMLFormElement;
+                updateTask(target.value, task.id);
                 handleClick();
               }
              }}></input>
              <button onClick={(e) => {
                e.preventDefault();
-               handleRemoveTask(task.id);
+               handleRemoveTask(task.id, task.order);
              }}>Del</button>
        
             </div>
