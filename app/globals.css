@@ -18,11 +18,20 @@ body {
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
+
   font-family: Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+body.dark {
+  color: var(--foreground);
+  background: var(--background);
+}
+
+body.light {
+  color: var(--background);
+  background: var(--foreground);
 }
 
 * {
@@ -41,12 +50,14 @@ a {
   text-decoration: none;
 }
 .todo-element {
-  border: solid 3px red;
+  /* border: solid 3px red; */ 
   min-height: 250px;
   max-height: 250px;
   height: 250px;
+  background-color: gray;
+  margin-top: 10px ;
 }
-.name, .todo-tasks .task {
+.todo-tasks {
   display: flex;
   flex-direction: wrap;
 }
@@ -66,7 +77,31 @@ a {
 .item-scroll:hover {
   overflow-y: auto;
 }
+.todo-tasks {
+  padding: 5px;
+  flex-direction: column;
+}
 
+.name {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+  padding: 5px;
+
+}
+.task {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+
+.task:hover {
+  background-color: #a19f9f;
+}
 .task-add {
   padding: 10px;
 }
@@ -87,12 +122,16 @@ input[type="checkbox"]:checked {
 }
 
 .todo-item-checkbox {
-  margin: 0.25rem;
+  margin: 0;
 }
 
 .text-completed {
   opacity: 60%;
   text-decoration-line: line-through;
+}
+
+.todo-add {
+  margin-top: 10px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -101,7 +140,11 @@ input[type="checkbox"]:checked {
   }
 }
 
-@media (min-width: 600px) {
+@media (min-width: 0px) and (max-width: 600px) {
+  .grid { grid-template-columns: repeat(1, 1fr);}
+
+}
+@media (min-width: 601px) {
   .grid { grid-template-columns: repeat(2, 1fr); }
 }
 
