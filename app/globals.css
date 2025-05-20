@@ -1,12 +1,23 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --todoelementbackground: #1e1e1e;
+  --todoelementborder: #333333;
+  --maincolor: #f0f0f0;
+  --secondcolor: #888888;
+  --hoverbackground: #3a3a3a;
+  --completedcolor: #686868;
+  --completedbackground: #252525;
+  --blue: #3b82f6;
+  --green: #22c55e;
+  --delete: #ef4444;
+  --inprogress: #eab300;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
---foreground: #ededed;
+  --foreground: #ededed;
   }
 }
 
@@ -25,7 +36,7 @@ body {
 }
 
 body.dark {
-  color: var(--foreground);
+  color: var(--maincolor);
   background: var(--background);
 }
 
@@ -50,11 +61,11 @@ a {
   text-decoration: none;
 }
 .todo-element {
-  /* border: solid 3px red; */ 
+  border: solid 3px var(--todoelementborder); 
   min-height: 250px;
   max-height: 250px;
   height: 250px;
-  background-color: gray;
+  background-color: var(--todoelementbackground);
   margin-top: 10px ;
 }
 .todo-tasks {
@@ -89,18 +100,32 @@ a {
   gap: 10px;
   margin-bottom: 5px;
   padding: 5px;
+  
 
 }
+
+.name:hover {
+  background-color: var(--hoverbackground);
+}
+.name h1, .name button {
+   cursor: pointer;
+}
+
+
 .task {
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 10px;
   margin-bottom: 5px;
+  transition: all 250ms ease-in-out 10ms;
 }
 
+.task p, .task button {
+  cursor: pointer;
+}
 .task:hover {
-  background-color: #a19f9f;
+  background-color: var(--hoverbackground);
 }
 .task-add {
   padding: 10px;
