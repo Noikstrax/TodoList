@@ -17,7 +17,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
-  --foreground: #ededed;
+    --foreground: #ededed;
   }
 }
 
@@ -78,6 +78,9 @@ a {
   flex-direction: column;
   height: 100%;
 }
+.todo-element-header {
+  padding: 5px;
+}
 
 .item-scroll {
   overflow-y: hidden;
@@ -98,10 +101,6 @@ a {
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 10px;
-  margin-bottom: 5px;
-  padding: 5px;
-  
-
 }
 
 .name:hover {
@@ -130,6 +129,9 @@ a {
 .task-add {
   padding: 10px;
 }
+.task-add button {
+  margin-left: 5px;
+}
 
 input[type="checkbox"] {
   appearance: none;
@@ -157,6 +159,7 @@ input[type="checkbox"]:checked {
 
 .todo-add {
   margin-top: 10px;
+  margin-left: 13px;
 }
 
 @media (prefers-color-scheme: dark) {

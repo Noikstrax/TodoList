@@ -164,6 +164,7 @@ export default function TodoElement({todoItem, updateTodoItems, handleCheckEleme
             <div className={''} 
             >
             <div className="todo-element" key={todoElementData.id}>
+                <div className='todo-element-header'>
                 <div className={clsx('name',
                     todoElementData.isCompleted && 'text-completed'
                 )}>
@@ -176,6 +177,7 @@ export default function TodoElement({todoItem, updateTodoItems, handleCheckEleme
                         e.preventDefault();
                         handleDeleteElement(todoElementData.id, todoElementData.order);
                     }}>Del</button>
+                </div>
                 </div>
                 <div className='item-scroll'>
                     <div className='todo-tasks'>
